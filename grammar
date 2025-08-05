@@ -1,0 +1,171 @@
+unit:
+    directive unit*
+    label unit*
+    instruction unit*
+
+directive:
+    'section' string-literal ';'
+    alignment-specifier ';'
+    'extern' identifier ';'
+    integer-constant ';'
+    string-literal ';'
+
+alignment-specifier:
+    'align' '('* integer-constant ')'*
+
+integer-constant:
+    decimal-integer-constant
+    hex-integer-constant
+
+decimal-integer-constant:
+    '-'* digit-sequence type-disambiguator*
+
+hex-integer-constant:
+    '-'* '0' 'x' hex-digit-sequence type-disambiguator*
+
+hex-digit:
+    digit
+    'A', 'B', 'C', 'D', 'E', 'F'
+    'a', 'b', 'c', 'd', 'e', 'f'
+
+hex-digit-sequence:
+    hex-digit hex-digit-sequence*
+    '_' hex-digit-sequence*
+
+digit:
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+
+digit-sequence:
+    digit digit-sequence*
+    '_' digit-sequence*
+
+type-disambiguator:
+    'i8', 'i16', 'i32', 'i64'
+    'u8', 'u16', 'u32', 'u64'
+
+string-literal:
+    '"' s-char-sequence '"'
+
+s-char-sequence:
+    s-char s-char-sequence*
+
+s-char:
+    (any ASCII character except '\', '"', or a newline)
+    escape-sequence
+
+escape-sequence:
+    '\\', '\"', '\n'
+
+label:
+    label-specifiers* identifier ':'
+
+label-specifiers:
+    label-specifier label-specifiers*
+
+label-specifier:
+    alignment-specifier
+    'extern'
+    'routine'
+    'readonly'
+    'data'
+
+instruction:
+    instruction-definition ';'
+
+instruction-definition:
+    mnemonic operand-sequence*
+    move-definition
+    lea-definition
+    xor-definition
+
+operand-sequence:
+    operand operand-sequence-ext*
+
+operand-sequence-ext:
+    ',' operand operand-sequence-ext*
+
+mnemonic:
+    identifier
+
+operand:
+    operand-type-specifier* operand-definition
+
+operand-type-specifier:
+    '(' operand-type ')'
+
+operand-type:
+    'r8', 'r16', 'r32', 'r64'
+    'm8', 'm16', 'm32', 'm64'
+    'imm8', 'imm16', 'imm32', 'imm64'
+    'sse'
+
+operand-definition:
+    integer-constant
+    '*' register
+    '*' '(' register register-offset* constant-offset* constant-factor* ')'
+    register
+    identifier
+
+register:
+    'rax', 'rdi', ...
+    'eax', 'edi', ...
+    'ax', 'di', ...
+    'al', 'dil', ...
+    'r0', 'r1', ...
+    'ro0', 'ro1', ...
+    'rq0', 'rq1', ...
+    'rd0', 'rd1', ...
+    'rs0', 'rs1', ...
+    'rb0', 'rb1', ...
+
+register-offset:
+    '+' register
+
+constant-offset:
+    '+' integer-constant
+    '-' integer-constant
+
+constant-factor:
+    '*' integer-constant
+
+identifier:
+    letter identifier-sequence*
+    '_' identifier-sequence*
+
+identifier-sequence:
+    letter identifier-sequence*
+    digit identifier-sequence*
+    '_' identifier-sequence*
+
+move-definition:
+    operand '=' operand
+
+lea-definition:
+    operand '=' '&' operand
+
+xor-definition:
+    operand '^=' operand
+
+pretoken:
+    identifier
+    punctuator
+    pretoken-number
+    string-literal
+
+token:
+    identifier
+    punctuator
+    integer-constant
+    string-literal
+    keyword
+    register
+
+keyword:
+    'extern'
+    'routine'
+    'readonly'
+    'data'
+    'r8', 'r16', 'r32', 'r64'
+    'm8', 'm16', 'm32', 'm64'
+    'imm8', 'imm16', 'imm32', 'imm64'
+    'sse'

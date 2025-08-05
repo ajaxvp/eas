@@ -1,6 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-int main(void)
+int main(int argc, char** argv)
 {
-    printf("hello, world!\n");
+    if (argc <= 1)
+    {
+        printf("eas: error: no input files\n");
+        return EXIT_FAILURE;
+    }
 }
